@@ -23,3 +23,9 @@ model Billing {
   credits   Int
   userId    String @unique // Foreign key field
 }
+
+enum Plans {
+  STANDARD
+  PRO
+  ULTIMATE
+}
