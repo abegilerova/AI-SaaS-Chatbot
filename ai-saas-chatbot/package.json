@@ -11,6 +11,8 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.22.11",
     "@clerk/nextjs": "^6.11.1",
+    "@neondatabase/serverless": "^0.10.4",
+    "@prisma/client": "^6.3.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "latest": "^0.2.0",
