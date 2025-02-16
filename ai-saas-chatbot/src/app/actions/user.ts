@@ -4,14 +4,29 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function saveUser(name: string, email: string) {
+export async function createUser({
+  clerkId,
+  fullname,
+  type,
+}: {
+  clerkId: string;
+  fullname: string;
+  type: string;
+}) {
   try {
-    const user = await prisma.user.create({
-      data: { fullname, email },
+    const savedUser = await prisma.user.upsert({
+      where: { id: clerkId }, // Add the 'id' property with the value of 'clerkId'
+      update: { updatedAt: new Date() },
+      create: {
+        clerkId,
+        fullname,
+        type,
+      },
     });
-    return { success: true, user };
+
+    return savedUser;
   } catch (error) {
     console.error("Error saving user:", error);
-    return { success: false, error: "Failed to save user" };
+    throw new Error("Failed to save user");
   }
 }
