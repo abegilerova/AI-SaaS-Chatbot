@@ -1,36 +1,70 @@
-import { NextRequest, NextResponse } from "next/server";
+import { Webhook } from "svix";
+import { headers } from "next/headers";
+import { WebhookEvent } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+//import { prisma } from "@/lib/prisma"; 
 import { createUser } from "@/app/actions/user";
 
-
-const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET!;
-
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    // Verify Clerk's webhook secret
-    const secret = req.headers.get("clerk-secret");
-    if (!secret || secret !== CLERK_WEBHOOK_SECRET) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+
+    if (!CLERK_WEBHOOK_SECRET) {
+      console.error("❌ Error: CLERK_WEBHOOK_SECRET is missing.");
+      return NextResponse.json({ error: "Missing secret" }, { status: 500 });
     }
 
-    const body = await req.json();
+    const wh = new Webhook(CLERK_WEBHOOK_SECRET);
+    
+    // Await headers() before calling .get()
+    const headerPayload = await headers();  
 
-    // Ensure it's a user creation event
-    if (body.type !== "user.created") {
-      return NextResponse.json({ message: "Event ignored" }, { status: 200 });
+    const svix_id = headerPayload.get("svix-id");
+    const svix_timestamp = headerPayload.get("svix-timestamp");
+    const svix_signature = headerPayload.get("svix-signature");
+
+    if (!svix_id || !svix_timestamp || !svix_signature) {
+      return NextResponse.json({ error: "Missing Svix headers" }, { status: 400 });
     }
 
-    const user = body.data;
+    // Parse the incoming request
+    const payload = await req.json();
+    const body = JSON.stringify(payload);
 
-    // Call the server action to save the user in NeonDB
-    const savedUser = await createUser({
-      clerkId: user.id,
-      fullname: `${user.first_name} ${user.last_name}`,
-      type: "user", // Default role, modify as needed
-    });
+    // Verify the webhook
+    const evt = wh.verify(body, {
+      "svix-id": svix_id,
+      "svix-timestamp": svix_timestamp,
+      "svix-signature": svix_signature,
+    }) as WebhookEvent;
 
-    return NextResponse.json({ message: "User saved", user: savedUser }, { status: 200 });
+    console.log(`✅ Received webhook with type: ${evt.type}`);
+    console.log(`📌 Webhook payload:`, evt.data);
+
+    if (evt.type === "user.created") {
+      const userData = evt.data;
+      console.log(`🆕 New user created with Clerk ID: ${userData.id}`);
+
+   
+
+
+        const newUser = await createUser({
+          fullname: `${userData.first_name} ${userData.last_name}`,
+          clerkId: userData.id,
+          type: "user",
+          stripeId: "", 
+      });
+
+      if (newUser) {
+        console.log("✅ User stored in database successfully.");
+      } else {
+        console.log("⚠️ User could not be saved.");
+      }
+    }
+    // Always return a response
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Clerk Webhook Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("❌ Webhook processing failed:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
