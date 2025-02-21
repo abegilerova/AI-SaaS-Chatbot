@@ -7,9 +7,11 @@ import { SignIn } from "@clerk/nextjs";
 
 export default function SignInPage() {
   const { isSignedIn, isLoaded } = useAuth();
+
   const router = useRouter();
 
   useEffect(() => {
+
     if (isLoaded && isSignedIn) {
       router.replace("/dashboard"); // Use `replace` to prevent back navigation
     }

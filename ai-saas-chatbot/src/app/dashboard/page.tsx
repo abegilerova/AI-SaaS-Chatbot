@@ -5,7 +5,7 @@ export default function DashboardPage() {
     console.log("here aika")
   return (
     <div>
-      <h1>Dashboard</h1>
+      {/* <h1>Dashboard</h1> */}
       <Sidebar/>
     </div>
   );
