@@ -1,10 +1,10 @@
 // src/app/actions/user.ts
 
-import { prisma } from "@/lib/prisma"; // Make sure this is correctly imported
+import { client } from "@/lib/prisma"; // Make sure this is correctly imported
 
 export async function createUser({ fullname, clerkId, type, stripeId }: { fullname: string; clerkId: string; type: string; stripeId?: string }) {
   try {
-    const newUser = await prisma.user.create({
+    const newUser = await client.user.create({
       data: {
         fullname,
         clerkId,

@@ -11,7 +11,7 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   fullname  String
-  clerkId   String
+  clerkId   String @unique
   type      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

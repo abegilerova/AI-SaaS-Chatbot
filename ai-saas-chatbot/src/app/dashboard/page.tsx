@@ -1,5 +1,5 @@
 import React from 'react';
-import Sidebar from '../components/Sidebard';
+import Sidebar from '../components/Sidebar';
 
 export default function DashboardPage() {
     console.log("here aika")
