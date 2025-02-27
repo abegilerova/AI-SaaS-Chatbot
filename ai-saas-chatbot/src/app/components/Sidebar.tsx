@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import DashboardIcon from "../icons/dashboard-icon";
 import { Menu, MessageSquare, Settings, Calendar, Mail } from "lucide-react";
-import SidebarItem from "./SideBarItem"
+import SidebarItem from "./SideBarItem";
+import DomaninMenu from "./sidebar/domain-menu";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -28,6 +29,7 @@ const Sidebar = () => {
         <SidebarItem icon={<Mail className="h-5 w-5" />} text="Email Marketing" collapsed={collapsed} />
         <SidebarItem icon={<Settings className="h-5 w-5" />} text="Settings" collapsed={collapsed} />
       </ul>
+      <DomaninMenu domains={[]} />
     </div>
   );
 };
