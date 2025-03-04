@@ -1,9 +1,11 @@
-import { toast as sonnerToast } from "sonner";
+import { toast } from "sonner";
 
 export const useToast = () => {
-  const toast = ({ title, description, type = "info" }: { title: string; description?: string; type?: "success" | "error" | "info" }) => {
-    sonnerToast[type](title, { description });
+  return {
+    toast: ({ title, description }: { title: string; description: string }) => {
+      toast(title, {
+        description,
+      });
+    },
   };
-
-  return { toast };
 };

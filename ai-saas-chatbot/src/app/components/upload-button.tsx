@@ -1,48 +1,61 @@
-import { useState } from "react";
+"use client";
+
 import { UploadClient } from "@uploadcare/upload-client";
 import { Button } from "./ui/button";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+
+interface UploadButtonProps {
+  onUploadComplete: (fileUrl: string) => void;
+  children: React.ReactNode;
+}
 
 const uploadClient = new UploadClient({
-  publicKey: process.env.NEXT_PUBLIC_UPLOAD_CARE_PUBLIC_KEY as string
+  publicKey: "944ad5ac330ec5724929",
 });
 
-type UploadButtonProps = {
-  onUpload: (url: string) => void;
-};
+export default function UploadButton({
+  onUploadComplete,
+  children,
+}: UploadButtonProps) {
+  const [isUploading, setIsUploading] = useState(false);
+  const { toast } = useToast();
 
-const UploadButton = ({ onUpload }: UploadButtonProps) => {
-  const [loading, setLoading] = useState(false);
-
-const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
-    setLoading(true);
     try {
-        const { cdnUrl: fileUrl } = await uploadClient.uploadFile(file);
-        onUpload(fileUrl);
+      setIsUploading(true);
+      const result = await uploadClient.uploadFile(file);
+      if (result.cdnUrl) {
+        onUploadComplete(result.cdnUrl);
+      }
     } catch (error) {
-        console.error("Upload failed", error);
+      console.error("Upload failed:", error);
+      toast({
+        title: "Error",
+        description: "Failed to upload file. Please try again.",
+      });
     } finally {
-        setLoading(false);
+      setIsUploading(false);
     }
-};
+  };
 
   return (
-    <div>
+    <Button
+      type="button"
+      variant="outline"
+      disabled={isUploading}
+      className="relative"
+    >
       <input
         type="file"
-        accept="image/*"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         onChange={handleUpload}
-        disabled={loading}
-        className="hidden"
-        id="upload-input"
+        accept="image/*"
       />
-      <label htmlFor="upload-input">
-        <Button disabled={loading}>{loading ? "Uploading..." : "Upload Icon"}</Button>
-      </label>
-    </div>
+      {isUploading ? "Uploading..." : children}
+    </Button>
   );
-};
-
-export default UploadButton;
+}

@@ -1,17 +1,15 @@
-import { z } from "zod";
+import * as z from "zod";
 
 export const AddDomainSchema = z.object({
-  domain: z
+  name: z
     .string()
-    .min(3, "Domain must be at least 3 characters long")
-    .max(255, "Domain must be less than 255 characters")
+    .min(1, "Domain name is required")
     .regex(
-      /^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,6}$/,
-      "Invalid domain format"
+      /^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/,
+      "Please enter a valid domain name (e.g., example.com)"
     ),
-  icon: z
-    .any()
-    .refine((file) => file && file.length > 0, "Icon is required"),
+  icon: z.string().min(1, "Domain icon is required"),
+  campaignId: z.string().optional(),
 });
 
-export type AddDomainType = z.infer<typeof AddDomainSchema>;
+export type AddDomainInput = z.infer<typeof AddDomainSchema>;
