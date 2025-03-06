@@ -13,6 +13,8 @@ import { Dialog, DialogContent, DialogTrigger,
   DialogHeader,
   DialogTitle, } from "../ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import SidebarItem from "../SideBarItem";
+import { Globe } from "lucide-react"; 
 
 
 type Props = {
@@ -162,29 +164,16 @@ const DomainMenu = ({ domains, min }: Props) => {
       </Dialog>
 
       <div className="space-y-2">
-        {domains?.map((domain) => (
-          <Link
+      <ul className="space-y-3">
+      {domains?.map((domain) => (
+          <SidebarItem
             key={domain.id}
-            href={`/domains/${domain.name}`}
-            className={cn(
-              "flex items-center gap-2 rounded-lg px-3 py-2 text-gray-900 transition-all hover:bg-gray-100",
-              isDomain === domain.name && "bg-gray-100 font-medium",
-              min && "justify-center"
-            )}
-          >
-            {domain.icon && (
-              <div className="relative w-5 h-5">
-                <Image
-                  src={domain.icon}
-                  alt={domain.name}
-                  fill
-                  className="object-cover rounded-sm"
-                />
-              </div>
-            )}
-            {!min && <span className="text-sm">{domain.name}</span>}
-          </Link>
+            icon={domain.icon ? <img src={domain.icon} alt={domain.name} className="h-5 w-5 rounded-full" /> : <Globe className="h-5 w-5" />}
+            text={domain.name}
+            collapsed={false} // Adjust based on Sidebar collapsed state
+          />
         ))}
+          </ul>
       </div>
     </div>
   );
