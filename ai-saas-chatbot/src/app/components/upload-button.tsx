@@ -11,7 +11,7 @@ interface UploadButtonProps {
 }
 
 const uploadClient = new UploadClient({
-  publicKey: "944ad5ac330ec5724929",
+  publicKey: "dcec60048f78338fee69",
 });
 
 export default function UploadButton({
